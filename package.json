@@ -1,0 +1,15 @@
+{
+  "name": "wordi",
+  "version": "1.0.0",
+  "description": "Extension for learing foreigh languages",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@wordi_gh:aerozhenkov-cw3course/wordi.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
