@@ -4,6 +4,8 @@ import { TranslateController } from "./controllers/translate.controller";
 import { ClientsModule, Transport } from "@nestjs/microservices";
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from "./entities/user";
+import {ServeStaticModule} from "@nestjs/serve-static";
+import * as path from "path";
 
 @Module({
     imports: [
@@ -29,9 +31,13 @@ import { User } from "./entities/user";
             // synchronize: true,
         }),
         TypeOrmModule.forFeature([User]),
+        ServeStaticModule.forRoot({
+            rootPath: path.join(__dirname, '..', 'static')
+        })
     ],
     controllers: [TranslateController, AuthController],
     providers: [],
 })
+
 export class AppModule {}
 

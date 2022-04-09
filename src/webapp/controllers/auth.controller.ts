@@ -1,5 +1,4 @@
 import {Body, Controller, Get, Inject, Post} from '@nestjs/common';
-import {ClientProxy, MessagePattern} from "@nestjs/microservices";
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../entities/user";
 import {Repository} from "typeorm";

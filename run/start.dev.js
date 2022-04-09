@@ -1,6 +1,6 @@
 const { spawn } = require('child_process');
-const bootstrapWebapp = require('../dist/src/webapp/index').bootstrap;
-const bootstrapTranslate = require('../dist/src/translate/index').bootstrap;
+const bootstrapWebapp = require('../dist/webapp/index').bootstrap;
+const bootstrapTranslate = require('../dist/translate/index').bootstrap;
 
 bootstrapWebapp({port: 3000})
 bootstrapTranslate({port: 2000})
