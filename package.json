@@ -4,6 +4,7 @@
   "description": "Extension for learning foreign languages",
   "scripts": {
     "prebuild": "rimraf dist",
+    "compose": "docker-compose -f run/pg-and-redis.docker-copmose.yaml up",
     "build:front": "webpack -c src/front/webpack.config.js --mode production",
     "build:back": "nest build",
     "build": "npm run build:front && npm run build:back",
