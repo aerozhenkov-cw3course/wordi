@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/nest-cli",
+  "collection": "@nestjs/schematics",
+  "compilerOptions": {
+    "tsConfigPath": "./tsconfig.json"
+  },
+  "entryFile": "../run/start.dev.js",
+  "projects": {
+    "my-project": {
+      "type": "application",
+      "root": "src/webapp",
+      "entryFile": "index",
+      "sourceRoot": "src/webapp",
+      "compilerOptions": {
+        "tsConfigPath": "tsconfig.json"
+      }
+    },
+    "my-app": {
+      "type": "application",
+      "root": "src/translate",
+      "entryFile": "index",
+      "sourceRoot": "src/translate",
+      "compilerOptions": {
+        "tsConfigPath": "tsconfig.json"
+      }
+    }
+  }
+}
