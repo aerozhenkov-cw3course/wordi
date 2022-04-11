@@ -1,13 +1,13 @@
 import {Body, Controller, Get, Inject, Res, HttpStatus} from '@nestjs/common';
 import {ClientProxy} from "@nestjs/microservices";
-import * as request from '../../types/api/request';
-import * as response from '../../types/api/response';
+import * as request from '../types/api/request';
+import * as response from '../types/api/response';
 import {timeout, firstValueFrom} from "rxjs";
 import {Response} from "express";
-import {TranslationValue} from "../../types/translation";
+import {TranslationValue} from "../types/translation";
 
 @Controller()
-export class TranslateController {
+export class TranslationClientController {
     constructor(
         @Inject('TRANSLATION_SERVICE') private translationService: ClientProxy,
     ) {}

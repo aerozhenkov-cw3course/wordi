@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Inject, Post} from '@nestjs/common';
+import {Body, Controller, Get, Inject, Post, UseGuards} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../entities/user";
 import {Repository} from "typeorm";
@@ -17,6 +17,7 @@ export class AuthController {
     }
 
     @Post('/signup')
+    @UseGuards()
     create(@Body() {email, password}) {
 
         return this.userRepo.save({email, password})

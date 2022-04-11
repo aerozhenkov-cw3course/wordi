@@ -1,11 +1,19 @@
-import * as request from '../types/api/request';
-import * as response from '../types/api/response';
 import axios from "axios";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
+type TranslationKey = {
+    // example: en-ru
+    lang: string;
+    word: string;
+}
 
-const apiUrl = axios.create({
+type TranslationValue = Array<{
+    value: string,
+    examples: string[]
+}>
+
+const api$ = axios.create({
     baseURL: 'http://localhost:3000/'
 });
 
@@ -13,11 +21,11 @@ async function main() {
     const lang = 'en-ru';
     const word = 'example';
 
-    const res: response.Translate = await axios.get<response.Translate>('http://localhost:3000/translate', {
+    const res: TranslationValue = await axios.get<TranslationValue>('http://localhost:3000/translate', {
         data: {
             lang,
             word
-        } as request.Translate
+        } as TranslationKey
     }).then((res) => res.data);
 
     console.group(`${lang.toUpperCase()}: ${word}`)

@@ -3,9 +3,9 @@ import {MessagePattern, Payload} from "@nestjs/microservices";
 import {TranslationKey, TranslationValue} from "../types/translation";
 
 @Controller()
-export class AppController {
+export class TranslationController {
     @MessagePattern('translate')
-    getHello(@Payload() {lang, word}: TranslationKey): Promise<TranslationValue> {
+    translate(@Payload() {lang, word}: TranslationKey): Promise<TranslationValue> {
 
         // TODO: написать логику запроса к внешнему сервису перевода, а потом кэширования в redis
         return new Promise<TranslationValue>(resolve => setTimeout(() => {

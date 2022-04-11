@@ -4,14 +4,12 @@
   "description": "Extension for learning foreign languages",
   "scripts": {
     "prebuild": "rimraf dist",
+    "build": "nest build",
     "compose": "docker-compose -f run/pg-and-redis.docker-copmose.yaml up",
-    "build:front": "webpack -c src/front/webpack.config.js --mode production",
-    "build:back": "nest build",
-    "build": "npm run build:front && npm run build:back",
-    "dev:back": "nest start --watch",
-    "dev:front": "webpack -c src/front/webpack.config.js --mode development && nest start",
-    "start:dev": "nest start --watch",
-    "start:debug": "nest start --debug --watch"
+    "start": "ENV_FILE_PATH=run/config/dotenv/.dev.env nest start",
+    "start:dev": "ENV_FILE_PATH=run/config/dotenv/.dev.env nest start --watch",
+    "start:debug": "ENV_FILE_PATH=run/config/dotenv/.dev.env nest start --debug --watch",
+    "webpack": "webpack -c src/front/webpack.config.js --mode production"
   },
   "repository": {
     "type": "git",
@@ -51,7 +49,9 @@
   "dependencies": {
     "@nestjs/common": "^8.4.3",
     "@nestjs/core": "^8.4.3",
+    "@nestjs/jwt": "^8.0.0",
     "@nestjs/microservices": "^8.4.4",
+    "@nestjs/passport": "^8.2.1",
     "@nestjs/platform-express": "^8.4.3",
     "@nestjs/serve-static": "^2.2.2",
     "@nestjs/typeorm": "^8.0.3",

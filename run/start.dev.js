@@ -1,31 +1,42 @@
-const { spawn } = require('child_process');
-const bootstrapWebapp = require('../dist/webapp/index').bootstrap;
-const bootstrapTranslate = require('../dist/translate/index').bootstrap;
+const dotenv = require('dotenv')
+const main = require('../dist/apps/main');
+const translation = require('../dist/apps/translation');
 
-bootstrapWebapp({port: 3000})
-bootstrapTranslate({port: 2000})
+const envFilePath = process.env.ENV_FILE_PATH
 
-const sleep = (ms) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+if (!envFilePath) throw new Error("No .env file provided")
+
+dotenv.config({
+    path: envFilePath
+})
+
+const runMain = async () => {
+    await main.bootstrap({
+        port: parseInt(process.env.MAIN_PORT),
+        translationClient: {
+            port: parseInt(process.env.TRANSLATION_SERVICE_PORT),
+            host: 'localhost'
+        },
+        pgOrm: {
+            port: parseInt(process.env.PG_PORT),
+            host: process.env.PG_HOST,
+            username: process.env.PG_USER,
+            password: process.env.PG_PASSWORD,
+            database: process.env.PD_DATABASE
+        }
+    })
 }
-//
-// const startPostgresAndRedisInDocker = async () => {
-//     spawn('docker-compose', [
-//         '-f', 'config/docker/pg-and-redis.docker-copmose.yaml',
-//         '--env-file', './config/dotenv/.dev.env',
-//         'up']
-//     )
-//     await sleep(3000);
-// }
-//
-// const startServices = () => {
-//     spawn('node', ['-f', '', '--env-file', './dotenv/.env', 'up'])
-//     spawn('docker-compose', ['-f', '', '--env-file', './dotenv/.env', 'up'])
-//     spawn('docker-compose', ['-f', '', '--env-file', './dotenv/.env', 'up'])
-// }
-//
-// // startPostgresAndRedisInDocker()
-// //     .then()
-//
-// console.log('yeah')
-//
+
+const runTranslation = async () => {
+    await translation.bootstrap({
+        port: parseInt(process.env.TRANSLATION_SERVICE_PORT),
+        host: 'localhost'
+    })
+}
+
+Promise.all([
+    runTranslation(),
+    runMain()
+]).then(() => {
+    console.info(`App is now running in dev mode on port = ${process.env.MAIN_PORT}`)
+})
