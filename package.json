@@ -5,7 +5,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "nest build",
-    "compose": "docker-compose -f run/pg-and-redis.docker-copmose.yaml up",
+    "compose": "docker-compose -f run/config/pg-and-redis.docker-copmose.yaml up",
     "start": "ENV_FILE_PATH=run/config/dotenv/.dev.env nest start",
     "start:dev": "ENV_FILE_PATH=run/config/dotenv/.dev.env nest start --watch",
     "start:debug": "ENV_FILE_PATH=run/config/dotenv/.dev.env nest start --debug --watch",

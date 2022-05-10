@@ -1,6 +1,7 @@
 const dotenv = require('dotenv')
 const main = require('../dist/apps/main');
 const translation = require('../dist/apps/translation');
+const subscription = require('../dist/apps/subscription');
 
 const envFilePath = process.env.ENV_FILE_PATH
 
@@ -15,6 +16,10 @@ const runMain = async () => {
         port: parseInt(process.env.MAIN_PORT),
         translationClient: {
             port: parseInt(process.env.TRANSLATION_SERVICE_PORT),
+            host: 'localhost'
+        },
+        subscriptionClient: {
+            port: parseInt(process.env.SUBSCRIPTION_SERVICE_PORT),
             host: 'localhost'
         },
         pgOrm: {
@@ -34,8 +39,16 @@ const runTranslation = async () => {
     })
 }
 
+const runSubscription = async () => {
+    await subscription.bootstrap({
+        port: parseInt(process.env.SUBSCRIPTION_SERVICE_PORT),
+        host: 'localhost'
+    })
+}
+
 Promise.all([
     runTranslation(),
+    runSubscription(),
     runMain()
 ]).then(() => {
     console.info(`App is now running in dev mode on port = ${process.env.MAIN_PORT}`)

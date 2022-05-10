@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: admin
+      POSTGRES_DB: wordi
     volumes:
       - local_pgdata:/var/lib/postgresql/data
 

@@ -9,14 +9,20 @@ import {
     ITranslationClientModuleOptions
 } from "./translationClient.module";
 import {
+    default as SubscriptionClientModule,
+    ISubscriptionClientModuleOptions
+} from "./subscriptionClient.module";
+import {
     default as PgOrmModule,
     IPgOrmModuleOptions
 } from "./pgOrm.module";
 import {TranslationClientController} from "../controllers/translationClient.controller";
 import {AuthController} from "../controllers/auth.controller";
+import {SubscriptionClientController} from "../controllers/subscriptionClient.controller";
 
 export type IMainModuleOptions = {
     translationClient: ITranslationClientModuleOptions,
+    subscriptionClient: ISubscriptionClientModuleOptions,
     pgOrm: Omit<IPgOrmModuleOptions, 'entities'>
 }
 
@@ -26,16 +32,17 @@ export default class MainModule {
             module: MainModule,
             imports: [
                 TranslationClientModule(options.translationClient),
+                SubscriptionClientModule(options.subscriptionClient),
                 PgOrmModule({
                     ...options.pgOrm,
                     entities: [User]
                 }),
                 TypeOrmModule.forFeature([User]),
-                ServeStaticModule.forRoot({
-                    rootPath: join(__dirname, '..', 'static')
-                })
+                // ServeStaticModule.forRoot({
+                //     rootPath: join(__dirname, '..', 'static')
+                // })
             ],
-            controllers: [AuthController, TranslationClientController]
+            controllers: [AuthController, TranslationClientController, SubscriptionClientController]
         }
     }
 }

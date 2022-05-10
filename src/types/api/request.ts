@@ -15,3 +15,7 @@ export type AddToDictionary = TranslationKey;
 export type DeleteFromDictionary = TranslationKey;
 
 export type Translate = TranslationKey;
+
+export interface Subscribe {
+    hui: 'hui' | 'her'
+}

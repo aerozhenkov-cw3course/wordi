@@ -12,8 +12,9 @@ export type IPgOrmModuleOptions = {
 export default function(options: IPgOrmModuleOptions) {
     return TypeOrmModule.forRoot({
         type: 'postgres',
-        ...options
+        ...options,
         // autoLoadEntities: true,
-        // synchronize: true,
+        synchronize: true,
+
     });
 }
