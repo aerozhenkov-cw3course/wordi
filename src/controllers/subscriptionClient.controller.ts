@@ -45,5 +45,26 @@ export class SubscriptionClientController {
                     .send()
             )
     }
+
+    @Get('subscribe-version-2')
+    async subscribe_version2(
+        @Res() res: Response<any>
+    ): Promise<any> {
+        const response$ = this.subscriptionService.send<any>('req-to-you-kassa', {})
+
+        return firstValueFrom(response$)
+            .then((value) =>
+                // вернул, что-то. Обрабатываем
+                res
+                    .status(HttpStatus.OK)
+                    .send(value)
+            )
+            .catch(() =>
+                // for example, микросервис упал
+                res
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .send()
+            )
+    }
 }
 

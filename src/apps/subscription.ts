@@ -1,14 +1,15 @@
 import {NestFactory} from "@nestjs/core";
 import {MicroserviceOptions, Transport} from "@nestjs/microservices";
-import {SubscriptionModule} from "../modules/subscription.module";
+import SubscriptionModule, {ISubscriptionModuleOptions} from "../modules/subscription.module";
 
-type ISubscriptionBootstrapOptions = {
+type ISubscriptionBootstrapOptions = ISubscriptionModuleOptions & {
     port: number,
     host: string
 }
 
-export const bootstrap = async ({port, host}: ISubscriptionBootstrapOptions) => {
-    const app = await NestFactory.createMicroservice<MicroserviceOptions>(SubscriptionModule, {
+export const bootstrap = async ({port, host, pgOrm}: ISubscriptionBootstrapOptions) => {
+    const app = await NestFactory.createMicroservice<MicroserviceOptions>(
+        SubscriptionModule.register({pgOrm}), {
         transport: Transport.TCP,
         options: {
             port,

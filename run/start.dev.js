@@ -42,7 +42,14 @@ const runTranslation = async () => {
 const runSubscription = async () => {
     await subscription.bootstrap({
         port: parseInt(process.env.SUBSCRIPTION_SERVICE_PORT),
-        host: 'localhost'
+        host: 'localhost',
+        pgOrm: {
+            port: parseInt(process.env.PG_PORT),
+            host: process.env.PG_HOST,
+            username: process.env.PG_USER,
+            password: process.env.PG_PASSWORD,
+            database: process.env.PD_DATABASE
+        }
     })
 }
 
