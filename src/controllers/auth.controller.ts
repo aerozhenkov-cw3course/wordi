@@ -1,4 +1,4 @@
-import {Body, Controller, Get, HttpStatus, Inject, Post, Res, UseGuards} from '@nestjs/common';
+import {Body, Controller, Get, HttpStatus, Inject, Post, Req, Res, UseGuards} from '@nestjs/common';
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../entities/user";
 import {Repository} from "typeorm";
@@ -8,6 +8,7 @@ import * as response from '../types/api/response';
 import {Tokens} from "../types/token";
 import {Response} from "express";
 import {JwtService} from "../services/jwt.service";
+import {AuthGuard} from "@nestjs/passport";
 
 const salt = 5;
 
@@ -79,6 +80,60 @@ export class AuthController {
         const [accessToken, refreshToken] = await Promise.all([
             this.jwtService.generateAccessToken(foundUser),
             this.jwtService.generateRefreshToken(foundUser)
+        ])
+
+        return res
+            .status(HttpStatus.OK)
+            .send({
+                accessToken,
+                refreshToken
+            })
+    }
+
+    @Get('login-with-google')
+    @UseGuards(AuthGuard('google'))
+    async signInWithGoogle() {}
+
+    @Get('auth/google/callback')
+    @UseGuards(AuthGuard('google'))
+    async googleAuthRedirect(@Req() req, @Res() res: Response<response.SignUp>) {
+        const { email } = req.user;
+        const newUser = await this.userRepo.save(
+            {
+                email
+            }
+        )
+
+        const [accessToken, refreshToken] = await Promise.all([
+            this.jwtService.generateAccessToken(newUser),
+            this.jwtService.generateRefreshToken(newUser)
+        ])
+
+        return res
+            .status(HttpStatus.OK)
+            .send({
+                accessToken,
+                refreshToken
+            })
+    }
+
+    @Get('login-with-vk')
+    @UseGuards(AuthGuard('vk'))
+    async signInWithVk() {}
+
+    @Get('auth/vk/callback')
+    @UseGuards(AuthGuard('vk'))
+    async vkAuthRedirect(@Req() req, @Res() res: Response<response.SignUp>) {
+        const { email } = req.user;
+        const newUser = await this.userRepo.save(
+            {
+                email
+            }
+        )
+
+        const [accessToken, refreshToken] = await Promise.all([
+            this.jwtService.generateAccessToken(newUser),
+            this.jwtService.generateRefreshToken(newUser)
         ])
 
         return res

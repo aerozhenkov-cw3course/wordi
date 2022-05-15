@@ -22,6 +22,8 @@ import {SubscriptionClientController} from "../controllers/subscriptionClient.co
 import {JwtModule} from "@nestjs/jwt";
 import {JwtService} from "../services/jwt.service";
 import {AuthMiddleware} from "../middleware/auth.middleware";
+import {GoogleStrategy} from "../strategies/google.strategy";
+import {VkStrategy} from "../strategies/vk.strategy";
 
 export type IMainModuleOptions = {
     translationClient: ITranslationClientModuleOptions,
@@ -53,7 +55,7 @@ export default class MainModule implements NestModule {
                 // })
             ],
             controllers: [AuthController, TranslationClientController, SubscriptionClientController],
-            providers: [JwtService]
+            providers: [JwtService, GoogleStrategy, VkStrategy]
         }
     }
 }
