@@ -1,6 +1,6 @@
 import {DynamicModule} from '@nestjs/common';
 import {SubscriptionController} from "../controllers/subscription.controller";
-import {User} from "../entities/user";
+import {Subscription} from "../entities/subscription";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import PgOrmModule, {IPgOrmModuleOptions} from "./pgOrm.module";
 import {HttpModule} from "@nestjs/axios";
@@ -16,9 +16,9 @@ export default class SubscriptionModule {
             imports: [
                 PgOrmModule({
                     ...options.pgOrm,
-                    entities: [User]
+                    entities: [Subscription]
                 }),
-                TypeOrmModule.forFeature([User]),
+                TypeOrmModule.forFeature([Subscription]),
                 HttpModule
             ],
             controllers: [SubscriptionController]

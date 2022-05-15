@@ -1,3 +1,4 @@
+import internal from "stream";
 import {TranslationKey} from "../translation";
 
 export interface Signup {
@@ -17,5 +18,9 @@ export type DeleteFromDictionary = TranslationKey;
 export type Translate = TranslationKey;
 
 export interface Subscribe {
-    hui: 'hui' | 'her'
+    userId: number;
+}
+
+export interface CompletePayment {
+    userId: number;
 }
