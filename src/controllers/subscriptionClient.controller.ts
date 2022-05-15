@@ -1,9 +1,11 @@
-import {Body, Controller, Get, Inject, Res, HttpStatus} from '@nestjs/common';
+import {Body, Controller, Get, Inject, Res, HttpStatus, Post, Req} from '@nestjs/common';
 import {ClientProxy} from "@nestjs/microservices";
 import * as request from '../types/api/request';
 import * as response from '../types/api/response';
 import {timeout, firstValueFrom} from "rxjs";
 import {Response} from "express";
+import { Request } from 'express';
+import Stripe from 'stripe';
 
 @Controller()
 export class SubscriptionClientController {
@@ -17,54 +19,70 @@ export class SubscriptionClientController {
         @Res() res: Response<response.Subscribe>
     ): Promise<any> {
 
-        const {hui} = data;
-
-        if(!hui) {
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-            res.status(HttpStatus.BAD_REQUEST).send("no hui provided")
-        }
-
         // proxy to microservice through tcp (not http! (read nestjs docs))
         // result – stream of answers, but you need only first. That's why below "firstValueFrom"
         const subscription$ = this.subscriptionService.send<response.Subscribe>('subscribe', data)
             .pipe(
-                timeout(2000)
+                timeout(5000)
             )
-
         return firstValueFrom(subscription$)
-            .then((value) =>
+            .then((value) =>{
                 // вернул, что-то. Обрабатываем
                 res
-                    .status(HttpStatus.OK)
-                    .send(value)
+                    .redirect(value.url)
+            },
             )
-            .catch(() =>
+            .catch((e) =>{
+                console.log(e);
                 // for example, микросервис упал
                 res
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .send()
+            }
             )
     }
 
-    @Get('subscribe-version-2')
-    async subscribe_version2(
+    @Post('/webhook')
+    async webhook(
+        @Req() req: Request<any>,
         @Res() res: Response<any>
     ): Promise<any> {
-        const response$ = this.subscriptionService.send<any>('req-to-you-kassa', {})
+        const endpointSecret = process.env.WH_SECRET;
+        const payload = req.body;
+        const sig = req.headers['stripe-signature'];
+        const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY, {
+            apiVersion: '2020-08-27',
+          });;
+        let event;
+        try {
+            event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+          } catch (err) {
+            // invalid signature
+            res.status(400).end();
+            return;
+        }
 
-        return firstValueFrom(response$)
-            .then((value) =>
-                // вернул, что-то. Обрабатываем
-                res
-                    .status(HttpStatus.OK)
-                    .send(value)
-            )
-            .catch(() =>
-                // for example, микросервис упал
-                res
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .send()
-            )
+        let intent = null;
+        switch (event['type']) {
+            case 'payment_intent.succeeded':
+                intent = event.data.object;
+                console.log("Succeeded:", intent.id);
+                let r : request.CompletePayment = {
+                    userId: intent.userId
+                }
+                this.subscriptionService.send('complete_payment', r)
+                .pipe(
+                    timeout(5000)
+                )
+                break;
+            case 'payment_intent.payment_failed':
+                intent = event.data.object;
+                const message = intent.last_payment_error && intent.last_payment_error.message;
+                console.log('Failed:', intent.id, message);
+                break;
+        }
+
+        res.status(200);
     }
 }
 

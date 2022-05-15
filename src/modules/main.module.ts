@@ -38,9 +38,9 @@ export default class MainModule {
                     entities: [User]
                 }),
                 TypeOrmModule.forFeature([User]),
-                // ServeStaticModule.forRoot({
-                //     rootPath: join(__dirname, '..', 'static')
-                // })
+                ServeStaticModule.forRoot({
+                    rootPath: join(__dirname, '..', 'static')
+                })
             ],
             controllers: [AuthController, TranslationClientController, SubscriptionClientController]
         }
