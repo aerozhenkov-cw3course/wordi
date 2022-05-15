@@ -4,49 +4,57 @@ import * as request from '../types/api/request';
 import * as response from '../types/api/response';
 import {InjectRepository} from "@nestjs/typeorm";
 import {User} from "../entities/user";
+import {Subscription} from "../entities/subscription";
 import {Repository} from "typeorm";
 import {HttpService} from "@nestjs/axios";
 import {firstValueFrom, Observable} from "rxjs";
 import {AxiosResponse} from "axios";
+import Stripe from 'stripe';
+import { ok } from 'assert';
 
 @Controller()
 export class SubscriptionController {
     constructor(
-        @InjectRepository(User) private readonly userRepo: Repository<User>,
+        @InjectRepository(Subscription) private readonly subscriptionRepo: Repository<Subscription>,
         private httpService: HttpService
     ) {}
 
     @MessagePattern('subscribe')
-    async subscribe(@Payload() {hui}: request.Subscribe): Promise<response.Subscribe> {
-        const usersCount = await this.userRepo.count();
-
+    async subscribe(@Payload() {userId}: request.Subscribe): Promise<response.Subscribe> {
+        const stripe = new Stripe(process.env.STRIPE_PRIVATE_KEY, {
+            apiVersion: '2020-08-27',
+          });;
+        const storeItem = { priceInCents: 1000, name: "Basic plan" }
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            mode: 'payment',
+            line_items: [{
+                  price_data: {
+                    currency: "usd",
+                    product_data: {
+                      name: storeItem.name,
+                    },
+                    unit_amount: storeItem.priceInCents,
+                  },
+                  quantity: 1,
+                }
+            ],
+            success_url: `${process.env.CLIENT_URL}/success.html`,
+            cancel_url: `${process.env.CLIENT_URL}/cancel.html`,
+        });
         // return to main service that will proxy it to client
         return new Promise<response.Subscribe>(resolve => setTimeout(() => {
-            // @тс-игнор – если не компилится из-за строчки, но не злоупотребляй
-            // @ts-ignore
-            resolve({pidor: "success", hui_given: hui, usersCount})
+            resolve({url: session.url})
         }, 1500));
     }
 
-    @MessagePattern('req-to-you-kassa')
-    async method2(): Promise<TodoType[]> {
-        const url: string = 'https://jsonplaceholder.typicode.com/todos'
-        const response$: Observable<AxiosResponse<TodoType[]>> = this.httpService.get(url);
+    @MessagePattern('/complete_payment')
+    async complete_payment(@Payload() {userId}: request.CompletePayment){
+        let endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + 1)
+        this.subscriptionRepo.save({endDate, userId})
+        console.log("Payment Completed successfully");
 
-        const response = await firstValueFrom(response$);
-
-        const todos: TodoType[] = response.data;
-
-        return todos
-            .slice(0, 3)
-            .map(todo => ({
-            ...todo,
-            pizda: 'pizda'
-        }))
+        return true;
     }
-}
-
-type TodoType = {
-    title: string,
-    completed: boolean
 }
