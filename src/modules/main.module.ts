@@ -1,4 +1,4 @@
-import {DynamicModule, Module} from "@nestjs/common";
+import {DynamicModule, MiddlewareConsumer, Module, NestModule} from "@nestjs/common";
 import {ClientsModule, Transport} from "@nestjs/microservices";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {User} from "../entities/user";
@@ -19,6 +19,9 @@ import {
 import {TranslationClientController} from "../controllers/translationClient.controller";
 import {AuthController} from "../controllers/auth.controller";
 import {SubscriptionClientController} from "../controllers/subscriptionClient.controller";
+import {JwtModule} from "@nestjs/jwt";
+import {JwtService} from "../services/jwt.service";
+import {AuthMiddleware} from "../middleware/auth.middleware";
 
 export type IMainModuleOptions = {
     translationClient: ITranslationClientModuleOptions,
@@ -26,7 +29,14 @@ export type IMainModuleOptions = {
     pgOrm: Omit<IPgOrmModuleOptions, 'entities'>
 }
 
-export default class MainModule {
+export default class MainModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(AuthMiddleware)
+            .forRoutes('*')
+            // .forRoutes('cats');
+    }
+
     static register(options: IMainModuleOptions): DynamicModule {
         return {
             module: MainModule,
@@ -42,7 +52,8 @@ export default class MainModule {
                 //     rootPath: join(__dirname, '..', 'static')
                 // })
             ],
-            controllers: [AuthController, TranslationClientController, SubscriptionClientController]
+            controllers: [AuthController, TranslationClientController, SubscriptionClientController],
+            providers: [JwtService]
         }
     }
 }
